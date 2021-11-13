@@ -6,7 +6,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src https://*; child-src 'none';"
     /> -->
-    <title>Banking Demo</title>
+    <title>Ach Demo</title>
     <link href="css/styles.css" rel="stylesheet" />
     <link
       href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap"
@@ -23,77 +23,25 @@
   <body>
     <div class="container">
       <div id="reactors">
+        <h1>Generated ACH File</h1>
         <div class="row row-blank">
-          <div class="row row-input" id="card_token"></div>
-
-          <div class="row row-blank">
-            <button
-                    id="view_only_button"
-                    type="button"
-                    onclick="readBank()"
-            >
-              View Only
-            </button>
-
-            <div id="view_only_result">
-              <h2>View Only <i class="fas fa-sync-alt" onclick="readBank()"></i></h2>
-              <div class="row row-input" id="view_only_routing"></div>
-              <div class="row row-input" id="view_only_account"></div>
-            </div>
-          </div>
-
-          <div class="row row-blank">
-            <button
-                    id="decrypt_and_edit_button"
-                    type="button"
-                    onclick="decryptBank()"
-            >
-              Show Decrypted Bank
-            </button>
-
-            <div id="decrypted_result">
-            <div id="update_form">
-                <h2>Update Bank <i class="fas fa-check" id="update_bank_success"></i></h2>
-                <div class="row row-input">
-                  <label for="update_bank_routing">Routing Number</label>
-                  <input id="update_bank_routing" placeholder="" value="" />
-                </div>
-                <div class="row row-input">
-                  <label for="update_bank_account">Account</label>
-                  <input id="update_bank_account" placeholder="" value="" />
-                </div>
-                <button
-                        id="update_submit_button"
-                        type="button"
-                        onclick="updateBank()"
-                >
-                  Update
-                </button>
-            </div>
-              </div>
-          </div>
-
+          <div class="row row-input" id="ach_file_result"></div>
         </div>
       </div>
       <div id="form">
-        <h1>Add New Bank</h1>
-        <div class="row row-input">
-          <label for="bank_routing">Routing Number</label>
-          <input id="bank_routing" placeholder="110000000" value="110000000" />
-        </div>
-        <div class="row row-input">
-          <label for="bank_account">Account</label>
-          <input id="bank_account" placeholder="000123456789" value="000123456789" />
-        </div>
-        <div class="row row-helper">
-          Use test bank "110000000", "000123456789"
+        <h1>Generate ACH File</h1>
+        <div class="row row-input ach_row">
+          <textarea id="ach_file">
+$10 - 1234567890 - {{fd52c7a4-473d-48a4-b373-241a15e77abe}}
+$20 - 1234567890 - {{abb23863-ca59-4e79-bd91-9baf4669edcc}}
+$30 - 1234567890 - {{baf51757-3e64-4eb7-b4c9-7b32d8d4f3d7}}</textarea>
         </div>
         <button
           id="submit_button"
           type="button"
-          onclick="submitBank()"
+          onclick="submitAch()"
         >
-          Submit
+          Generate and Send ACH file
         </button>
       </div>
     </div>
