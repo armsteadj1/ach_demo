@@ -4,10 +4,10 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "nodemon --watch public --watch src src/index.js"
   },
   "dependencies": {
-    "@basis-theory/basis-theory-js": "1.0.2",
+    "@basis-theory/basis-theory-js": "^1.0.2",
     "express": "4.17.1",
     "node-fetch": "2.6.1",
     "stripe": "8.167.0"

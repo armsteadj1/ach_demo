@@ -16,6 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,900&display=swap"
       rel="stylesheet"
     />
+    <script src="https://kit.fontawesome.com/9d4d70a342.js" crossorigin="anonymous"></script>
     <script src="https://js.basistheory.com"></script>
     <script src="js/index.js"></script>
   </head>
@@ -23,55 +24,74 @@
     <div class="container">
       <div id="reactors">
         <div class="row row-blank">
-          <h1>Company Wide Access</h1>
           <div class="row row-input" id="card_token"></div>
-          <div class="row row-input" id="stripe_token"></div>
-          <div class="row row-input" id="braintree_token"></div>
-          <div class="row row-input" id="adyen_token"></div>
-          <div class="row row-input" id="parrot_token"></div>
-        </div>
 
-        <div class="row row-blank">
-          <h1>Line of Business / Product #1</h1>
-          <button class="reactor" type="button" onclick="reactWithStripe()">
-            Get Stripe token to charge
-          </button>
+          <div class="row row-blank">
+            <button
+                    id="view_only_button"
+                    type="button"
+                    onclick="readBank()"
+            >
+              View Only
+            </button>
+
+            <div id="view_only_result">
+              <h2>View Only <i class="fas fa-sync-alt" onclick="readBank()"></i></h2>
+              <div class="row row-input" id="view_only_routing"></div>
+              <div class="row row-input" id="view_only_account"></div>
+            </div>
+          </div>
+
+          <div class="row row-blank">
+            <button
+                    id="decrypt_and_edit_button"
+                    type="button"
+                    onclick="decryptBank()"
+            >
+              Show Decrypted Bank
+            </button>
+
+            <div id="decrypted_result">
+            <div id="update_form">
+                <h2>Update Bank <i class="fas fa-check" id="update_bank_success"></i></h2>
+                <div class="row row-input">
+                  <label for="update_bank_routing">Routing Number</label>
+                  <input id="update_bank_routing" placeholder="" value="" />
+                </div>
+                <div class="row row-input">
+                  <label for="update_bank_account">Account</label>
+                  <input id="update_bank_account" placeholder="" value="" />
+                </div>
+                <button
+                        id="update_submit_button"
+                        type="button"
+                        onclick="updateBank()"
+                >
+                  Update
+                </button>
+            </div>
+              </div>
+          </div>
+
         </div>
-        <div class="row row-blank">
-          <h1>Line of Business / Product #2</h1>
-          <button class="reactor" type="button" onclick="reactWithBraintree()">
-            Get Braintree token to charge
-          </button>
-        </div>
-        <div class="row row-blank">
-          <h1>Line of Business / Product #3</h1>
-          <button class="reactor" type="button" onclick="reactwithAdyen()">
-            Get Adyen token to charge
-          </button>
-          <button class="reactor" type="button" onclick="reactWithParrot()">
-            Get BIN info from Parrot
-          </button>
-        </div>
-        <button onclick="tryAgain()" class="secondary">Try another card</button>
       </div>
       <div id="form">
-        <h1>Add New Bank<h1>
+        <h1>Add New Bank</h1>
         <div class="row row-input">
           <label for="bank_routing">Routing Number</label>
-          <input id="bank_routing" placeholder="110000000" />
+          <input id="bank_routing" placeholder="110000000" value="110000000" />
         </div>
         <div class="row row-input">
           <label for="bank_account">Account</label>
-          <input id="bank_account" placeholder="000123456789" />
+          <input id="bank_account" placeholder="000123456789" value="000123456789" />
         </div>
         <div class="row row-helper">
           Use test bank "110000000", "000123456789"
         </div>
         <button
           id="submit_button"
-          disabled
           type="button"
-          onclick="submit()"
+          onclick="submitBank()"
         >
           Submit
         </button>

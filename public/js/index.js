@@ -1,4 +1,5 @@
-const ELEMENTS_KEY = "key_XVB48UzHJ57TdPtmLhJa9e";
+const ELEMENTS_KEY = "key_6jq4nLGh32QgDf6mierhLG";
+const DECRYPT_KEY = "key_XcETzmrHLNf7VhdN8ePUab";
 const STRIPE_REACTOR_ID = "a0e7a38c-648e-45d9-a83c-be5eca2d56fa";
 const BRAINTREE_REACTOR_ID = "47e94b55-0d36-4f33-b0b2-f3ea30f15778";
 const ADYEN_REACTOR_ID = "c4557374-94c4-4432-a24e-577c595e6e8b";
@@ -32,23 +33,13 @@ window.addEventListener("load", async () => {
   await BasisTheory.init(ELEMENTS_KEY, {
     elements: true
   });
-
-  card = BasisTheory.elements.create("card", style);
-
-  await card.mount("#card");
-
-  card.on("change", (e) => {
-    const button = document.getElementById("submit_button");
-    console.log(e.complete);
-    button.disabled = !e.complete;
-  });
 });
 
 function displaySuccess() {
+  console.log(bank_token);
   document.getElementById(
     "card_token"
-  ).innerHTML = `<b><u>BT Token:</u></b>&nbsp;&nbsp;${bank_token.id}`;
-  document.getElementById("form").style.display = "none";
+  ).innerHTML = `<b><u>Token:</u></b>&nbsp;&nbsp;${bank_token.id}`;
   document.getElementById("reactors").style.display = "flex";
 }
 
@@ -56,81 +47,91 @@ function displayError() {
   document.getElementById("error").style.display = "flex";
 }
 
-async function reactWithStripe() {
-  const stripeToken = await react(STRIPE_REACTOR_ID, 1);
-  document.getElementById(
-    "stripe_token"
-  ).innerHTML = `<b><u>Stripe Token:</u></b>&nbsp;&nbsp;${stripeToken.reaction.id}`;
-  document.getElementById("stripe_token").style.display = "block";
-}
-
-async function reactwithAdyen() {
-  const adyenToken = await react(ADYEN_REACTOR_ID, 3);
-  document.getElementById(
-    "adyen_token"
-  ).innerHTML = `<b><u>Adyen Token:</u></b>&nbsp;&nbsp;${adyenToken.reaction.pspReference}`;
-  document.getElementById("adyen_token").style.display = "block";
-}
-
-async function reactWithBraintree() {
-  const braintreeToken = await react(BRAINTREE_REACTOR_ID, 2);
-  document.getElementById(
-    "braintree_token"
-  ).innerHTML = `<b><u>Braintree Token:</u></b>&nbsp;&nbsp;${braintreeToken.reaction.creditCard.token}`;
-  document.getElementById("braintree_token").style.display = "block";
-}
-
-async function reactWithParrot() {
-  const parrotToken = await react(PARROT_RECTOR_ID, 3);
-  document.getElementById(
-    "parrot_token"
-  ).innerHTML = `<b><u>Parrot BIN:</u></b>&nbsp;&nbsp;<br><pre>${JSON.stringify(
-    parrotToken.reaction,
-    null,
-    "\t"
-  )}</pre>`;
-  document.getElementById("parrot_token").style.display = "block";
-}
-
-async function react(reactor_id, lob_id) {
-  const response = await fetch(`/api/charge`, {
+async function readBank() {
+  const response = await fetch(`/api/read/bank`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json"
     },
     body: JSON.stringify({
-      card_token_id: bank_token.id,
-      reactor_id,
-      lob_id
+      bank_token_id: bank_token.id,
     })
   });
 
-  return await response.json();
+  const read_bank = await response.json();
+
+  document.getElementById("view_only_result").style.display = "block";
+  document.getElementById("view_only_button").style.display = "none";
+  document.getElementById(
+      "view_only_routing"
+  ).innerHTML = `<b><u>Routing:</u></b>&nbsp;&nbsp;${read_bank.bank.routingNumber}`;
+  document.getElementById(
+      "view_only_account"
+  ).innerHTML = `<b><u>Account:</u></b>&nbsp;&nbsp;${read_bank.bank.accountNumber}`;
 }
 
-async function useExistingCard(id) {
-  bank_token = { id };
+async function decryptBank() {
+  const response = await fetch(`/api/decrypt/bank`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({
+      bank_token_id: bank_token.id,
+    })
+  });
 
-  displaySuccess();
+  const decrypted_bank = await response.json();
+
+  document.getElementById("decrypted_result").style.display = "block";
+  document.getElementById("decrypt_and_edit_button").style.display = "none";
+  document.getElementById('update_bank_routing').value=decrypted_bank.bank.routingNumber;
+  document.getElementById('update_bank_account').value=decrypted_bank.bank.accountNumber;
 }
 
-async function submit() {
+async function submitBank() {
+  console.log("hello");
   const routingNumber = document.getElementById("bank_routing").value;
-  const accountNumber = document.getElementById("bank_number").value;
+  const accountNumber = document.getElementById("bank_account").value;
 
   console.log(routingNumber, accountNumber);
 
-  bank_number = await BasisTheory.atomicBanks.create({
+  bank_token = await BasisTheory.atomicBanks.create({
     bank: {
       routingNumber,
       accountNumber
     }
   });
 
-  if (bank_number) {
+  if (bank_token) {
     displaySuccess();
   }
+}
+
+async function updateBank() {
+  console.log("hello");
+  const routingNumber = document.getElementById("update_bank_routing").value;
+  const accountNumber = document.getElementById("update_bank_account").value;
+
+
+  const response = await fetch(`/api/update/bank`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({
+      bank_token_id: bank_token.id,
+      routingNumber,
+      accountNumber
+    })
+  });
+
+  bank_token = await response.json();
+
+  document.getElementById("update_bank_success").style.display = "contents";
 }
 
 function tryAgain() {
@@ -140,12 +141,4 @@ function tryAgain() {
   document.getElementById("adyen_token").style.display = "none";
   document.getElementById("form").style.display = "flex";
   document.getElementById("reactors").style.display = "none";
-}
-
-function showOptional() {
-  const optionals = document.getElementsByClassName("optional-row");
-  for (let element of optionals) {
-    console.log(element);
-    element.style.display = "flex";
-  }
 }

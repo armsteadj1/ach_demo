@@ -2,10 +2,7 @@ const { BasisTheory } = require("@basis-theory/basis-theory-js");
 const express = require("express");
 const app = express();
 
-const LOB_1_API_KEY = "key_Wmwpqsxe3LhyAB12wbTE6s";
-const LOB_2_API_KEY = "key_BHXqCXNUBrmBwnA2Pi76jK";
-const LOB_3_API_KEY = "key_2EemCsZexWkFtY8M7G8tAy";
-const LOB_KEYS = { 1: LOB_1_API_KEY, 2: LOB_2_API_KEY, 3: LOB_3_API_KEY };
+const API_KEY = "key_XcETzmrHLNf7VhdN8ePUab";
 
 app.use(express.static("public"));
 app.use(express.json());
@@ -32,14 +29,61 @@ async function react(tokenId, reactorId, apiKey) {
   return reactionToken.raw;
 }
 
-app.post("/api/charge", async (req, res) => {
-  const cardTokenId = req.body.card_token_id;
-  const lobId = req.body.lob_id;
-  const reactorId = req.body.reactor_id;
-  console.log(cardTokenId, reactorId);
-  const reaction = await react(cardTokenId, reactorId, LOB_KEYS[lobId]);
+app.post("/api/read/bank", async (req, res) => {
+  let token;
+  const bankTokenId = req.body.bank_token_id;
+  const bt = new BasisTheory();
+  bt.init(API_KEY);
 
-  return res.json({ reaction });
+  try {
+    token = await bt.atomicBanks.retrieve(bankTokenId);
+  } catch (e) {
+    console.log("error", e, JSON.stringify(e));
+  }
+
+  return res.json(token);
+});
+
+app.post("/api/decrypt/bank", async (req, res) => {
+  let token;
+  const bankTokenId = req.body.bank_token_id;
+  const bt = new BasisTheory();
+  bt.init(API_KEY);
+
+  try {
+    token = await bt.atomicBanks.retrieveDecrypted(bankTokenId);
+  } catch (e) {
+    console.log("error", e, JSON.stringify(e));
+  }
+
+  return res.json(token);
+});
+
+
+app.post("/api/update/bank", async (req, res) => {
+  let token;
+  const bankTokenId = req.body.bank_token_id;
+  const accountNumber = req.body.accountNumber;
+  const routingNumber = req.body.routingNumber;
+  const bt = new BasisTheory();
+  bt.init(API_KEY);
+
+  console.log(bankTokenId, accountNumber, routingNumber);
+  console.log("update");
+
+  try {
+    token = await bt.atomicBanks.update(bankTokenId, {
+      bank: {
+        routingNumber,
+        accountNumber,
+      },
+    });
+  } catch (e) {
+    console.log("error", e, JSON.stringify(e));
+  }
+
+  console.log("token", token)
+  return res.json(token);
 });
 
 app.listen(8080, () => {
